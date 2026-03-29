@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block content %}
+<h2>Edit Task</h2>
+<form
+  method="post"
+  action="{{ url_for('edit_task', task_id=task.id) }}"
+  class="form"
+>
+  <label>Title <input name="title" value="{{ task.title }}" required /></label>
+  <label
+    >Description <textarea name="description">{{ task.description }}</textarea>
+  </label>
+  <label
+    >Reminder (optional)
+    <input
+      type="datetime-local"
+      name="reminder"
+      value="{{ task.reminder_at.strftime('%Y-%m-%dT%H:%M') if task.reminder_at else '' }}"
+    />
+    <small>format: YYYY-MM-DD HH:MM or use picker</small>
+  </label>
+  <label
+    ><input
+      type="checkbox"
+      name="completed"
+      {%
+      if
+      task.completed
+      %}checked{%
+      endif
+      %}
+    />
+    Completed</label
+  >
+  <button class="btn">Save</button>
+</form>
+{% endblock %}

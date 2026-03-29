@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}To-Do & Reminders{% endblock %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <h1><a href="{{ url_for('index') }}">To-Do & Reminders</a></h1>
+        <nav>
+          <a href="{{ url_for('create_task') }}" class="btn">+ New Task</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="flashes">
+        {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %} {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <small>Simple Flask To-Do + Reminder app</small>
+      </div>
+    </footer>
+
+    <script>
+      // Polling for notifications
+      async function pollNotifications() {
+        try {
+          const resp = await fetch("/api/notifications");
+          if (!resp.ok) return;
+          const data = await resp.json();
+          if (data && data.length) {
+            // show reminders as simple alerts or nicer toasts
+            const ids = [];
+            data.forEach((t) => {
+              ids.push(t.id);
+              const msg = `Reminder: ${t.title} — due ${
+                t.reminder_at ? new Date(t.reminder_at).toLocaleString() : ""
+              }`;
+              // show a visual toast element (simple)
+              const toast = document.createElement("div");
+              toast.className = "toast";
+              toast.innerText = msg;
+              document.body.appendChild(toast);
+              setTimeout(() => toast.remove(), 15000);
+            });
+
+            // acknowledge to server
+            await fetch("/api/notifications/ack", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ids }),
+            });
+          }
+        } catch (e) {
+          console.error("Notification poll error", e);
+        }
+      }
+
+      // start polling
+      setInterval(pollNotifications, 20000); // every 20 seconds
+      // also run once on load
+      document.addEventListener("DOMContentLoaded", pollNotifications);
+    </script>
+  </body>
+</html>

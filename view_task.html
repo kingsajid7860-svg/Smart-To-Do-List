@@ -1,0 +1,16 @@
+{% extends "base.html" %} {% block content %}
+<h2>{{ task.title }}</h2>
+<p>{{ task.description or "(no description)" }}</p>
+<ul>
+  <li>Created: {{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
+  <li>Completed: {{ 'Yes' if task.completed else 'No' }}</li>
+  <li>
+    Reminder: {{ task.reminder_at.strftime('%Y-%m-%d %H:%M') if task.reminder_at
+    else 'None' }}
+  </li>
+</ul>
+<div>
+  <a href="{{ url_for('edit_task', task_id=task.id) }}" class="btn">Edit</a>
+  <a href="{{ url_for('index') }}" class="btn">Back</a>
+</div>
+{% endblock %}

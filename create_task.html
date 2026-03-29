@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block content %}
+<h2>Create Task</h2>
+<form method="post" action="{{ url_for('create_task') }}" class="form">
+  <label>Title <input name="title" required /></label>
+  <label>Description <textarea name="description"></textarea></label>
+  <label
+    >Reminder (optional)
+    <!-- use datetime-local for nicer input; value will be posted in local time format -->
+    <input type="datetime-local" name="reminder" />
+    <small>format: YYYY-MM-DD HH:MM (or use the picker)</small>
+  </label>
+  <button class="btn">Create Task</button>
+</form>
+{% endblock %}
